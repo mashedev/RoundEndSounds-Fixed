@@ -10,6 +10,7 @@ A maintained/fixed fork of [Stimayk/RoundEndSounds].
 - Improved localization fallback behavior
 - Updated build output for language files
 - Fixed volume control for direct `sounds/...` tracks
+- Added a perceptual volume curve so low settings are actually quiet
 
 ## Credits
 

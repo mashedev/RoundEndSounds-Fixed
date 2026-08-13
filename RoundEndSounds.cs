@@ -32,7 +32,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
     private Dictionary<ulong, UserSettings> _userSettingsCache = new();
     public override string ModuleName => "Round End Sounds";
-    public override string ModuleVersion => "v1.0.2";
+    public override string ModuleVersion => "v1.0.3";
     public override string ModuleAuthor => "E!N";
 
     public RoundEndSoundsConfig Config { get; set; } = new();
@@ -287,13 +287,15 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
         if (volume <= 0.01f) return;
 
+        var outputVolume = Math.Clamp(volume * volume, 0.0f, 1.0f);
+
         if (soundPath.StartsWith("sounds/"))
         {
-            var volumeArgument = volume.ToString("0.0", CultureInfo.InvariantCulture);
+            var volumeArgument = outputVolume.ToString("0.00", CultureInfo.InvariantCulture);
             player.ExecuteClientCommand($"playvol {soundPath} {volumeArgument}");
         }
         else
-            player.EmitSound(soundPath, player, volume);
+            player.EmitSound(soundPath, player, outputVolume);
     }
 
     private void PrintLocalizedChat(CCSPlayerController player, string key, params object[] args)
