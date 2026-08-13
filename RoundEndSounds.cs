@@ -7,6 +7,7 @@ using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Extensions;
+using CounterStrikeSharp.API.Modules.UserMessages;
 using CounterStrikeSharp.API.Modules.Utils;
 using MenuManager;
 using Microsoft.Extensions.Logging;
@@ -25,6 +26,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
     private static string _centerSoundName = string.Empty;
     private static string _centerSoundPicture = string.Empty;
     private List<int> _availableSoundIndices = [];
+    private readonly HashSet<string> _warnedRawSoundPaths = new(StringComparer.OrdinalIgnoreCase);
     private int _currentSoundIndex;
     private bool _isCacheLoaded;
 
@@ -32,7 +34,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
     private Dictionary<ulong, UserSettings> _userSettingsCache = new();
     public override string ModuleName => "Round End Sounds";
-    public override string ModuleVersion => "v1.0.4";
+    public override string ModuleVersion => "v1.0.5";
     public override string ModuleAuthor => "E!N";
 
     public RoundEndSoundsConfig Config { get; set; } = new();
@@ -287,16 +289,66 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
         if (volume <= 0.01f) return;
 
-        var outputVolume = Math.Clamp(volume * volume, 0.0f, 1.0f);
+        var outputVolume = Math.Clamp(volume, 0.0f, 1.0f);
+        soundPath = ResolveKnownSoundEvent(soundPath);
 
-        if (soundPath.StartsWith("sounds/"))
+        if (soundPath.StartsWith("sounds/", StringComparison.OrdinalIgnoreCase))
         {
-            var volumeArgument = outputVolume.ToString("0.00", CultureInfo.InvariantCulture);
-            player.ReplicateConVar("snd_toolvolume", volumeArgument);
+            if (_warnedRawSoundPaths.Add(soundPath))
+                Logger.LogWarning(
+                    "Raw sound path {SoundPath} uses CS2's play command at full volume. Configure its SoundEvent alias to enable per-player volume control.",
+                    soundPath);
+
             player.ExecuteClientCommand($"play {soundPath}");
+            return;
         }
-        else
-            player.EmitSound(soundPath, player, outputVolume);
+
+        var recipients = new RecipientFilter(player);
+        var soundEventGuid = player.EmitSound(soundPath, recipients, outputVolume);
+        if (soundEventGuid == 0)
+        {
+            Logger.LogWarning("SoundEvent {SoundEventName} did not return a valid GUID", soundPath);
+            return;
+        }
+
+        // CS2 currently ignores EmitSound's volume argument for some SoundEvent types.
+        // Update the public.volume parameter on the exact event instance instead.
+        Server.NextWorldUpdate(() => SetSoundEventVolume(player, soundEventGuid, outputVolume));
+    }
+
+    private static string ResolveKnownSoundEvent(string soundPath)
+    {
+        // Preserve volume control for configs generated from the plugin's original stock example.
+        return soundPath.Equals("sounds/music/theverkkars_01/roundmvpanthem_01.vsnd", StringComparison.OrdinalIgnoreCase) ||
+               soundPath.Equals("sounds/music/theverkkars_01/roundmvpanthem_01.vsnd_c", StringComparison.OrdinalIgnoreCase)
+            ? "Music.MVPPreview.theverkkars_01"
+            : soundPath;
+    }
+
+    private void SetSoundEventVolume(CCSPlayerController player, uint soundEventGuid, float volume)
+    {
+        if (!player.IsValid || player.IsBot || player.IsHLTV) return;
+
+        try
+        {
+            using var message = UserMessage.FromPartialName("SosSetSoundEventParams");
+            message.SetUInt("soundevent_guid", soundEventGuid);
+            message.SetBytes("packed_params", BuildSoundEventVolumeParams(volume));
+            message.Send(new RecipientFilter(player));
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception,
+                "Failed to set volume {Volume} for SoundEvent GUID {SoundEventGuid}", volume, soundEventGuid);
+        }
+    }
+
+    private static byte[] BuildSoundEventVolumeParams(float volume)
+    {
+        // Little-endian public.volume hash, float metadata, padding, then the value.
+        byte[] result = [0xE9, 0x54, 0x60, 0xBD, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00];
+        BitConverter.GetBytes(Math.Clamp(volume, 0.0f, 1.0f)).CopyTo(result, 7);
+        return result;
     }
 
     private void PrintLocalizedChat(CCSPlayerController player, string key, params object[] args)

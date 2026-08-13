@@ -26,7 +26,7 @@ public class RoundEndSoundsConfig : BasePluginConfig
         },
         {
             "The Verkkars - EZ4ENCE",
-            new SoundDefinition { Sound = "sounds/music/theverkkars_01/roundmvpanthem_01.vsnd" }
+            new SoundDefinition { Sound = "Music.MVPPreview.theverkkars_01" }
         }
     };
 }
