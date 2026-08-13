@@ -9,6 +9,7 @@ A maintained/fixed fork of [Stimayk/RoundEndSounds].
 - Removed hardcoded Russian UI strings
 - Improved localization fallback behavior
 - Updated build output for language files
+- Fixed volume control for direct `sounds/...` tracks
 
 ## Credits
 
