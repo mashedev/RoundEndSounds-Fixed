@@ -11,6 +11,7 @@ A maintained/fixed fork of [Stimayk/RoundEndSounds].
 - Updated build output for language files
 - Fixed volume control for direct `sounds/...` tracks
 - Added a perceptual volume curve so low settings are actually quiet
+- Restored direct track playback using CS2-compatible `snd_toolvolume` and `play`
 
 ## Credits
 

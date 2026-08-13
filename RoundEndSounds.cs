@@ -32,7 +32,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
     private Dictionary<ulong, UserSettings> _userSettingsCache = new();
     public override string ModuleName => "Round End Sounds";
-    public override string ModuleVersion => "v1.0.3";
+    public override string ModuleVersion => "v1.0.4";
     public override string ModuleAuthor => "E!N";
 
     public RoundEndSoundsConfig Config { get; set; } = new();
@@ -292,7 +292,8 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
         if (soundPath.StartsWith("sounds/"))
         {
             var volumeArgument = outputVolume.ToString("0.00", CultureInfo.InvariantCulture);
-            player.ExecuteClientCommand($"playvol {soundPath} {volumeArgument}");
+            player.ReplicateConVar("snd_toolvolume", volumeArgument);
+            player.ExecuteClientCommand($"play {soundPath}");
         }
         else
             player.EmitSound(soundPath, player, outputVolume);
