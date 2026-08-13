@@ -1,0 +1,23 @@
+{
+  "res.win_panel": "<b><font color='lime'>Şu an çalıyor:</font> <font color='white'>{0}</font></b>",
+  "res.chat_message": "{green}[♫ MÜZİK ♫] {default}Şu an çalıyor: {green}{0}",
+  "res.center_message": "<font color='lime'>{0}</font><br><b color='white'>━━━━━━━━━━━━━━━━━━━━━━━━</b><br><img src='{1}'></img>",
+  "res.msg": "{green}[♫ MÜZİK ♫] {default}Round sonu müzik ayarları için {green}!res {default}yazabilirsin.",
+
+  "res.main_menu.title": "Round Sonu Müzikleri",
+  "res.main_menu.state": "Müzik: {0}",
+  "res.main_menu.volume": "Ses Seviyesi: {0}",
+  "res.main_menu.sounds": "Müzik Listesi",
+  "res.main_menu.play_last_sound": "Son Çalan Müziği Dinle",
+
+  "res.volume": "Ses Seviyesi",
+  "res.volume.title": "Ses Seviyesi: {0}",
+  "res.volume_up": "Sesi Artır (+10%)",
+  "res.volume_down": "Sesi Azalt (-10%)",
+
+  "res.menu_sounds.title": "Dinlemek İstediğin Müziği Seç",
+  "res.playing_preview": "{Green}[MÜZİK]{Default} Ön izleme: {Olive}{0}",
+
+  "res.state.enabled": "Açık",
+  "res.state.disabled": "Kapalı"
+}

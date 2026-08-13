@@ -1,12 +1,15 @@
+using System.Globalization;
 using System.Text;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
+using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Extensions;
 using CounterStrikeSharp.API.Modules.Utils;
 using MenuManager;
+using Microsoft.Extensions.Logging;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace RoundEndSounds;
@@ -19,7 +22,8 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
     private static Timer? _centerHtmlTimer;
     private static bool _gIsCenterHtmlActive;
-    private static string _htmlMessage = string.Empty;
+    private static string _centerSoundName = string.Empty;
+    private static string _centerSoundPicture = string.Empty;
     private List<int> _availableSoundIndices = [];
     private int _currentSoundIndex;
     private bool _isCacheLoaded;
@@ -98,19 +102,19 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
                 Enabled = true
             };
 
-        player.PrintToChat(Localizer["res.msg"]);
+        PrintLocalizedChat(player, "res.msg");
 
         return HookResult.Continue;
     }
 
-    private static void OnTick()
+    private void OnTick()
     {
         if (_centerHtmlTimer == null || !_gIsCenterHtmlActive) return;
         foreach (var p in Utilities.GetPlayers()
                      .Where(player => player is { IsValid: true, IsBot: false, IsHLTV: false }))
         {
             var htmlBuilder = new StringBuilder();
-            htmlBuilder.AppendLine(_htmlMessage);
+            htmlBuilder.AppendLine(Localize(p, "res.center_message", _centerSoundName, _centerSoundPicture));
             htmlBuilder.AppendLine("</div>");
 
             var htmlMessage = htmlBuilder.ToString();
@@ -154,10 +158,11 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
             switch (Config.MessageType)
             {
                 case 1:
-                    player.PrintToChat($" {Localizer["res.chat_message", soundName]}");
+                    PrintLocalizedChat(player, "res.chat_message", soundName);
                     break;
                 case 2:
-                    _htmlMessage = Localizer["res.center_message", soundName, soundPicture];
+                    _centerSoundName = soundName;
+                    _centerSoundPicture = soundPicture;
                     _gIsCenterHtmlActive = true;
                     _centerHtmlTimer = AddTimer(
                         ConVar.Find("mp_round_restart_delay")?.GetPrimitiveValue<float>() ?? 10f, () =>
@@ -175,7 +180,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
                         FinalEvent = winner is CsTeam.CounterTerrorist
                             ? (int)RoundEndReason.CTsWin
                             : (int)RoundEndReason.TerroristsWin,
-                        FunfactToken = Localizer["res.win_panel", soundName]
+                        FunfactToken = Localize(player, "res.win_panel", soundName)
                     };
                     panel.FireEvent(false);
                     break;
@@ -200,22 +205,24 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
     {
         if (player == null || !player.IsValid || player.AuthorizedSteamID == null) return;
 
-        var menu = _menuApi.GetMenu(Localizer["res.main_menu.title"]);
+        var menu = _menuApi.GetMenu(Localize(player, "res.main_menu.title"));
 
         var isEnabled = GetPlayerResEnabled(player);
         var vol = GetPlayerVolume(player);
 
-        menu.AddMenuOption(Localizer["res.main_menu.state", isEnabled ? "вкл" : "выкл"], (p, _) =>
+        var state = Localize(player, isEnabled ? "res.state.enabled" : "res.state.disabled");
+        menu.AddMenuOption(Localize(player, "res.main_menu.state", state), (p, _) =>
         {
             UpdatePlayerSettings(p, vol, !isEnabled);
             MainMenu(p);
         });
 
-        menu.AddMenuOption(Localizer["res.main_menu.volume", $"{vol:0.0}"], (p, _) => OpenVolumeSettings(p));
+        menu.AddMenuOption(Localize(player, "res.main_menu.volume", $"{vol:0.0}"),
+            (p, _) => OpenVolumeSettings(p));
 
-        menu.AddMenuOption(Localizer["res.main_menu.sounds"], (p, _) => OpenMenuSounds(p));
+        menu.AddMenuOption(Localize(player, "res.main_menu.sounds"), (p, _) => OpenMenuSounds(p));
 
-        menu.AddMenuOption(Localizer["res.main_menu.play_last_sound"], (p, _) =>
+        menu.AddMenuOption(Localize(player, "res.main_menu.play_last_sound"), (p, _) =>
         {
             if (!string.IsNullOrEmpty(_lastSoundPath))
                 PlaySound(p, _lastSoundPath, true);
@@ -227,10 +234,10 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
     private void OpenVolumeSettings(CCSPlayerController player)
     {
         var currentVol = GetPlayerVolume(player);
-        var menu = _menuApi.GetMenu($"{Localizer["res.volume"]}: {currentVol:0.0}", MainMenu);
+        var menu = _menuApi.GetMenu(Localize(player, "res.volume.title", $"{currentVol:0.0}"), MainMenu);
         var isEnabled = GetPlayerResEnabled(player);
 
-        menu.AddMenuOption(Localizer["res.volume_up"], (p, _) =>
+        menu.AddMenuOption(Localize(player, "res.volume_up"), (p, _) =>
         {
             var newVol = (float)Math.Round(currentVol + 0.1f, 1);
             if (newVol > 0.9f) newVol = 0.9f;
@@ -239,7 +246,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
             OpenVolumeSettings(p);
         }, currentVol >= 0.9f);
 
-        menu.AddMenuOption(Localizer["res.volume_down"], (p, _) =>
+        menu.AddMenuOption(Localize(player, "res.volume_down"), (p, _) =>
         {
             var newVol = (float)Math.Round(currentVol - 0.1f, 1);
             if (newVol < 0.0f) newVol = 0.0f;
@@ -253,7 +260,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
 
     private void OpenMenuSounds(CCSPlayerController player)
     {
-        var menu = _menuApi.GetMenu(Localizer["res.menu_sounds.title"], MainMenu);
+        var menu = _menuApi.GetMenu(Localize(player, "res.menu_sounds.title"), MainMenu);
 
         foreach (var (soundName, value) in Config.Sounds)
         {
@@ -262,7 +269,7 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
             menu.AddMenuOption(soundName, (p, _) =>
             {
                 PlaySound(p, soundPath, true);
-                p.PrintToChat($" {Localizer["res.playing_preview", soundName]}");
+                PrintLocalizedChat(p, "res.playing_preview", soundName);
             });
         }
 
@@ -284,6 +291,34 @@ public class RoundEndSounds : BasePlugin, IPluginConfig<RoundEndSoundsConfig>
             player.ExecuteClientCommand($"play {soundPath}");
         else
             player.EmitSound(soundPath, player, volume);
+    }
+
+    private void PrintLocalizedChat(CCSPlayerController player, string key, params object[] args)
+    {
+        var message = Localize(player, key, args);
+        if (!string.IsNullOrEmpty(message))
+            player.PrintToChat($" {message}");
+    }
+
+    private string Localize(CCSPlayerController? player, string key, params object[] args)
+    {
+        CultureInfo[] cultures =
+        [
+            player.GetLanguage(),
+            CultureInfo.GetCultureInfo("en"),
+            CultureInfo.GetCultureInfo("ru")
+        ];
+
+        foreach (var culture in cultures.DistinctBy(candidate => candidate.Name))
+        {
+            using var temporaryCulture = new WithTemporaryCulture(culture);
+            var localized = Localizer[key, args];
+            if (!localized.ResourceNotFound)
+                return localized.Value;
+        }
+
+        Logger.LogWarning("Missing localization key {LocalizationKey} for all configured fallback languages", key);
+        return string.Empty;
     }
 
     private float GetPlayerVolume(CCSPlayerController player)

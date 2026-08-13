@@ -1,0 +1,8 @@
+bin/
+obj/
+artifacts/
+ready-to-install/
+.idea/
+.vscode/
+*.user
+RoundEndSounds-ready-to-install.zip

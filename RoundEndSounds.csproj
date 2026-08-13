@@ -8,16 +8,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CounterStrikeSharp.API" Version="*"/>
-        <PackageReference Include="Dapper" Version="*"/>
-        <PackageReference Include="MySqlConnector" Version="*"/>
+        <PackageReference Include="CounterStrikeSharp.API" Version="1.0.355"/>
+        <PackageReference Include="Dapper" Version="2.1.66"/>
+        <PackageReference Include="MySqlConnector" Version="2.5.0"/>
         <Reference Include="MenuManagerApi">
             <HintPath>MenuManagerApi.dll</HintPath>
         </Reference>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="lang\**\*.*" CopyToOutputDirectory="PreserveNewest"/>
+        <None Update="lang\**\*.json"
+              CopyToOutputDirectory="PreserveNewest"
+              CopyToPublishDirectory="PreserveNewest"/>
     </ItemGroup>
 
 </Project>

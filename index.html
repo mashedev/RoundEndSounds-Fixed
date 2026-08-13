@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
             --panel-bg: #2d2d2d;
             --input-bg: #3d3d3d;
             --border-color: #444;
-            --disabled-bg: #2a2a2a; /* Цвет для заблокированных полей */
+            --disabled-bg: #2a2a2a; /* Devre dışı alanların rengi */
         }
 
         body {
@@ -101,7 +101,7 @@
             border-radius: 4px;
         }
 
-        /* Стиль для заблокированных инпутов */
+        /* Devre dışı giriş alanlarının stili */
         input:disabled {
             background-color: var(--disabled-bg);
             color: #666;
@@ -171,42 +171,42 @@
     <h1>RES Config Generator</h1>
 
     <div class="toolbar">
-        <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">📂 Загрузить существующий Config</button>
-        <button class="btn btn-primary" onclick="downloadConfig()">💾 Скачать Config</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">📂 Mevcut Yapılandırmayı Yükle</button>
+        <button class="btn btn-primary" onclick="downloadConfig()">💾 Yapılandırmayı İndir</button>
         <input type="file" id="file-input" class="hidden-input" accept=".json" onchange="loadConfig(this)">
     </div>
 
     <!-- Drop Zone -->
     <div id="drop-zone">
-        <h3>Перетащите файлы .vsnd_c сюда</h3>
-        <p style="color: #888">Они автоматически добавятся в список ниже</p>
+        <h3>.vsnd_c dosyalarını buraya sürükleyin</h3>
+        <p style="color: #888">Dosyalar aşağıdaki listeye otomatik olarak eklenir</p>
     </div>
 
     <!-- Global Settings -->
     <details open>
-        <summary style="cursor: pointer; margin-bottom: 10px;">⚙️ Основные настройки</summary>
+        <summary style="cursor: pointer; margin-bottom: 10px;">⚙️ Genel Ayarlar</summary>
         <div class="settings-panel" id="global-settings">
-            <div class="form-group"><label>Хост бд</label><input type="text" id="conf-db-host"></div>
-            <div class="form-group"><label>Порт бд</label><input type="number" id="conf-db-port"></div>
-            <div class="form-group"><label>Пользователь бд</label><input type="text" id="conf-db-user"></div>
-            <div class="form-group"><label>Пароль бд</label><input type="text" id="conf-db-pass"></div>
-            <div class="form-group"><label>Имя бд</label><input type="text" id="conf-db-name"></div>
+            <div class="form-group"><label>Veritabanı Sunucusu</label><input type="text" id="conf-db-host"></div>
+            <div class="form-group"><label>Veritabanı Portu</label><input type="number" id="conf-db-port"></div>
+            <div class="form-group"><label>Veritabanı Kullanıcısı</label><input type="text" id="conf-db-user"></div>
+            <div class="form-group"><label>Veritabanı Parolası</label><input type="text" id="conf-db-pass"></div>
+            <div class="form-group"><label>Veritabanı Adı</label><input type="text" id="conf-db-name"></div>
             <div class="form-group">
-                <label>Стандартная громкость (0.0 - 0.9)</label>
+                <label>Varsayılan Ses Seviyesi (0.0 - 0.9)</label>
                 <input type="number" step="0.1" min="0.0" max="0.9" id="conf-vol">
             </div>
             <div class="form-group">
-                <label>Тип сообщений (1-3)</label>
+                <label>Mesaj Türü (1-3)</label>
                 <input type="number" min="1" max="3" id="conf-msg-type" oninput="toggleImageInputs()">
             </div>
-            <div class="form-group"><label>Рандомизировать</label>
+            <div class="form-group"><label>Rastgele Çal</label>
                 <select id="conf-random">
                     <option value="true">True</option>
                     <option value="false">False</option>
                 </select>
             </div>
             <div class="form-group full-width">
-                <label>Список файлов SoundEvents (каждый файл с новой строки)</label>
+                <label>SoundEvents Dosyaları (her satıra bir dosya)</label>
                 <textarea id="conf-sound-events" placeholder="soundevents_roundendsound.vsndevts"></textarea>
             </div>
         </div>
@@ -214,11 +214,11 @@
 
     <hr style="border-color: #333; margin: 20px 0;">
 
-    <h2>Список звуков</h2>
+    <h2>Müzik Listesi</h2>
     <div class="header-row">
-        <div>Название в игре</div>
-        <div>Путь к файлу</div>
-        <div>Ссылка на картинку (Только для типа 2)</div>
+        <div>Oyun İçi Ad</div>
+        <div>Dosya Yolu</div>
+        <div>Görsel Bağlantısı (yalnızca tür 2)</div>
         <div></div>
     </div>
     <div id="sound-list-container" class="sound-list">
@@ -236,7 +236,7 @@
         DefaultVolume: 0.3,
         Randomize: true,
         MessageType: 1,
-        SoundEventFiles: ["soundevents_roundendsound.vsndevts (это пример)"],
+        SoundEventFiles: ["soundevents_roundendsound.vsndevts"],
         Sounds: {}
     };
 
@@ -259,12 +259,12 @@
         imgInputs.forEach(input => {
             if (msgType === 2) {
                 input.disabled = false;
-                input.placeholder = "URL Картинки";
+                input.placeholder = "Görsel URL'si";
                 input.title = "";
             } else {
                 input.disabled = true;
-                input.placeholder = "Доступно только при Тип сообщений = 2";
-                input.title = "Измените 'Тип сообщений' на 2, чтобы редактировать";
+                input.placeholder = "Yalnızca Mesaj Türü = 2 olduğunda kullanılabilir";
+                input.title = "Düzenlemek için 'Mesaj Türü' değerini 2 yapın";
             }
         });
     }
@@ -355,9 +355,9 @@
             
             syncSettingsToUI();
             renderSoundList();
-            alert("Конфиг успешно загружен!");
+            alert("Yapılandırma başarıyla yüklendi!");
         } catch (e) {
-            alert("Ошибка чтения JSON: " + e.message);
+            alert("JSON okunurken hata oluştu: " + e.message);
         }
     }
 
@@ -418,16 +418,16 @@
             
             div.innerHTML = `
                 <div>
-                    <input type="text" placeholder="Название в игре" value="${item.name}" oninput="updateSound(${index}, 'name', this.value)">
+                    <input type="text" placeholder="Oyun içi ad" value="${item.name}" oninput="updateSound(${index}, 'name', this.value)">
                 </div>
                 <div>
-                    <input type="text" placeholder="Путь файла" value="${item.soundPath}" oninput="updateSound(${index}, 'soundPath', this.value)">
+                    <input type="text" placeholder="Dosya yolu" value="${item.soundPath}" oninput="updateSound(${index}, 'soundPath', this.value)">
                 </div>
                 <div>
-                    <input type="text" class="img-url-input" placeholder="URL Картинки" value="${item.soundPic}" oninput="updateSound(${index}, 'soundPic', this.value)">
+                    <input type="text" class="img-url-input" placeholder="Görsel URL'si" value="${item.soundPic}" oninput="updateSound(${index}, 'soundPic', this.value)">
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-danger" onclick="removeSound(${index})" title="Удалить">✕</button>
+                    <button class="btn btn-danger" onclick="removeSound(${index})" title="Sil">✕</button>
                 </div>
             `;
             container.appendChild(div);

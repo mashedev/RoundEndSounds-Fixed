@@ -1,7 +1,7 @@
 {
   "res.win_panel": "<b><font color='lime'>Сейчас играет:</font> <font color='white'>{0}</font></b>",
   "res.chat_message": "{green}[♫ ..ιllιlι.ιl. ♫] {default}Сейчас играет: {green}{0}",
-  "res.center_message": "<font color='lime'>{0}</font><br><b color='white'>━━━━━━━━━━━━━━━━━━━━━━━━<</b><br><img src='{1}'></img>",
+  "res.center_message": "<font color='lime'>{0}</font><br><b color='white'>━━━━━━━━━━━━━━━━━━━━━━━━</b><br><img src='{1}'></img>",
   "res.msg": "{green}[♫ ..ιllιlι.ιl. ♫] {default}Введите {green}!res {default}для управления музыкой в конце раунда",
   
   "res.main_menu.title": "Музыка в конце раунда",
@@ -11,9 +11,13 @@
   "res.main_menu.play_last_sound": "Прослушать последний трек",
   
   "res.volume": "Настройка громкости",
+  "res.volume.title": "Настройка громкости: {0}",
   "res.volume_up": "Громче (+10%)",
   "res.volume_down": "Тише (-10%)",
   
   "res.menu_sounds.title": "Выбор трека для прослушивания",
-  "res.playing_preview": "{Green}[RES]{Default} Прослушивание: {Olive}{0}"
+  "res.playing_preview": "{Green}[RES]{Default} Прослушивание: {Olive}{0}",
+
+  "res.state.enabled": "Вкл",
+  "res.state.disabled": "Выкл"
 }
