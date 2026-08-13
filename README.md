@@ -1,5 +1,18 @@
-# RoundEndSounds
+# RoundEndSounds Fixed
 
-# Created with the support of [NovaHost](https://nova-hosting.ru?ref=ein)
+A maintained/fixed fork of [Stimayk/RoundEndSounds].
 
-### More info: [CSDevs](https://csdevs.net/resources/round-end-sounds.1199/)
+## Changes
+
+- Fixed localization keys being displayed as raw text
+- Added Turkish localization
+- Removed hardcoded Russian UI strings
+- Improved localization fallback behavior
+- Updated build output for language files
+
+## Credits
+
+Original plugin by Stimayk:
+https://github.com/Stimayk/RoundEndSounds
+
+This repository contains modifications/fixes made to the original project.
